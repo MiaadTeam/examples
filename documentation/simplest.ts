@@ -96,6 +96,22 @@ const users = coreApp.odm.newModel("user", userPure, {
     },
   },
 
+  mostLovedCity: {
+    optional: true,
+    schemaName: "city",
+    type: "single",
+    relatedRelations: {
+      lovedByUser: {
+        type: "multiple",
+        limit: 3,
+        sort: {
+          field: "_id",
+          order: "desc",
+        },
+      },
+    },
+  },
+
   livedCountry: {
     optional: false,
     schemaName: "country",
@@ -368,6 +384,71 @@ coreApp.acts.setAct({
   actName: "addUserCities",
   validator: addUserCitiesValidator(),
   fn: addUserCities,
+});
+
+const addMostLovedCityValidator = () => {
+  return object({
+    set: object({
+      _id: objectIdValidation,
+      lovedCity: (objectIdValidation),
+    }),
+    get: coreApp.schemas.selectStruct("user", 1),
+  });
+};
+const addMostLovedCity: ActFn = async (body) => {
+  const { lovedCity, _id } = body.details.set;
+
+  return await users.addRelation({
+    _id: new ObjectId(_id),
+    projection: body.details.get,
+    relations: {
+      mostLovedCity: {
+        _ids: new ObjectId(lovedCity),
+        relatedRelations: {
+          lovedByUser: true,
+        },
+      },
+    },
+    replace: true,
+  });
+};
+coreApp.acts.setAct({
+  schema: "user",
+  actName: "addMostLovedCity",
+  validator: addMostLovedCityValidator(),
+  fn: addMostLovedCity,
+});
+
+const removeMostLovedCityValidator = () => {
+  return object({
+    set: object({
+      _id: objectIdValidation,
+      lovedCity: (objectIdValidation),
+    }),
+    get: coreApp.schemas.selectStruct("user", 1),
+  });
+};
+const removeMostLovedCity: ActFn = async (body) => {
+  const { lovedCity, _id } = body.details.set;
+
+  return await users.removeRelation({
+    _id: new ObjectId(_id),
+    projection: body.details.get,
+    relations: {
+      mostLovedCity: {
+        _ids: new ObjectId(lovedCity),
+        relatedRelations: {
+          lovedByUser: true,
+        },
+      },
+    },
+  });
+};
+coreApp.acts.setAct({
+  schema: "user",
+  actName: "removeMostLovedCity",
+  validator: removeMostLovedCityValidator(),
+  fn: removeMostLovedCity,
 });
 
 coreApp.runServer({ port: 1366, typeGeneration: true, playground: true });
