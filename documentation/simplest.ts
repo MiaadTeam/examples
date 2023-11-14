@@ -451,4 +451,40 @@ coreApp.acts.setAct({
   fn: removeMostLovedCity,
 });
 
+const removeLivedCitiesValidator = () => {
+  return object({
+    set: object({
+      _id: objectIdValidation,
+      livedCities: array(objectIdValidation),
+    }),
+    get: coreApp.schemas.selectStruct("user", 1),
+  });
+};
+const removeLivedCities: ActFn = async (body) => {
+  const { livedCities, _id } = body.details.set;
+
+  const obIdLivedCities = livedCities.map(
+    (lc: string) => new ObjectId(lc),
+  );
+
+  return await users.removeRelation({
+    _id: new ObjectId(_id),
+    projection: body.details.get,
+    relations: {
+      livedCities: {
+        _ids: obIdLivedCities,
+        relatedRelations: {
+          users: true,
+        },
+      },
+    },
+  });
+};
+coreApp.acts.setAct({
+  schema: "user",
+  actName: "removeLivedCities",
+  validator: removeLivedCitiesValidator(),
+  fn: removeLivedCities,
+});
+
 coreApp.runServer({ port: 1366, typeGeneration: true, playground: true });
