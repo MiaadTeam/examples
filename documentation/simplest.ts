@@ -432,7 +432,7 @@ const removeMostLovedCity: ActFn = async (body) => {
   const { lovedCity, _id } = body.details.set;
 
   return await users.removeRelation({
-    _id: new ObjectId(_id),
+    filters: { _id: new ObjectId(_id) },
     projection: body.details.get,
     relations: {
       mostLovedCity: {
@@ -468,7 +468,7 @@ const removeLivedCities: ActFn = async (body) => {
   );
 
   return await users.removeRelation({
-    _id: new ObjectId(_id),
+    filters: { _id: new ObjectId(_id) },
     projection: body.details.get,
     relations: {
       livedCities: {
