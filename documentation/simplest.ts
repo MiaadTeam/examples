@@ -215,7 +215,7 @@ const addCityCountry: ActFn = async (body) => {
   const { country, city, isCapital } = body.details.set;
 
   return await cities.addRelation({
-    _id: new ObjectId(city),
+    filters: { _id: new ObjectId(city) },
     projection: body.details.get,
     relations: {
       country: {
@@ -297,7 +297,7 @@ const addUserLivedCity: ActFn = async (body) => {
   );
 
   return await users.addRelation({
-    _id: new ObjectId(_id),
+    filters: { _id: new ObjectId(_id) },
     projection: body.details.get,
     relations: {
       livedCities: {
@@ -329,7 +329,7 @@ const addUserCountry: ActFn = async (body) => {
   const { livedCountry, _id } = body.details.set;
 
   return await users.addRelation({
-    _id: new ObjectId(_id),
+    filters: { _id: new ObjectId(_id) },
     projection: body.details.get,
     relations: {
       livedCountry: {
@@ -366,7 +366,7 @@ const addUserCities: ActFn = async (body) => {
   );
 
   return await users.addRelation({
-    _id: new ObjectId(_id),
+    filters: { _id: new ObjectId(_id) },
     projection: body.details.get,
     relations: {
       livedCities: {
@@ -399,7 +399,7 @@ const addMostLovedCity: ActFn = async (body) => {
   const { lovedCity, _id } = body.details.set;
 
   return await users.addRelation({
-    _id: new ObjectId(_id),
+    filters: { _id: new ObjectId(_id) },
     projection: body.details.get,
     relations: {
       mostLovedCity: {
